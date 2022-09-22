@@ -1,33 +1,11 @@
-package tasks
+package test2
 
 import (
 	"errors"
 	"fmt"
+	"github.com/google/go-cmp/cmp"
 	"testing"
 	"time"
-
-	"github.com/google/go-cmp/cmp"
-)
-
-type DBPerson struct {
-	ID      int
-	Name    string
-	Friends []int
-}
-
-type PopulatedPerson struct {
-	ID      int
-	Name    string
-	Friends []DBPerson
-}
-
-type Database struct {
-	database map[int]*DBPerson
-}
-
-var (
-	ErrNotImplemented = errors.New("not_implemented")
-	ErrPersonNotFound = errors.New("account_not_found")
 )
 
 func NewDatabase() *Database {
@@ -49,11 +27,6 @@ func (d *Database) GetUser(id int, out chan *DBPerson) error {
 	time.Sleep(time.Millisecond * 300)
 	out <- p
 	return nil
-}
-
-// Implement this method
-func populate(db *Database, id int) (*PopulatedPerson, error) {
-	return nil, ErrNotImplemented
 }
 
 type testCase2 struct {
@@ -79,6 +52,11 @@ func TestPopulate(t *testing.T) {
 		},
 		{
 			request: 350,
+			result:  nil,
+			err:     ErrPersonNotFound,
+		},
+		{
+			request: 123,
 			result: &PopulatedPerson{
 				ID:   123,
 				Name: "FriendNo1",
@@ -122,7 +100,7 @@ func TestPopulate(t *testing.T) {
 				t.Log("result is incorrect", cmp.Diff(res, test.result))
 				t.Fail()
 			}
-			if !cmp.Equal(err, test.err) {
+			if !errors.Is(err, test.err) {
 				t.Log("err is incorrect", cmp.Diff(err, test.err))
 				t.Fail()
 			}
