@@ -13,3 +13,10 @@ Fetch users and populate all of their friends
 ## Case 3
 
 Validate if two knights in a game of chess can attack each other based on their position.
+
+---
+
+Run the tests
+```bash
+    go test
+```
