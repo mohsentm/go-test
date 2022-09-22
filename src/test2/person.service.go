@@ -2,7 +2,6 @@ package test2
 
 import (
 	"errors"
-	"sync"
 )
 
 var (
@@ -17,50 +16,46 @@ type PopulatedPerson struct {
 }
 
 func populate(db *Database, id int) (*PopulatedPerson, error) {
-	dbOut := make(chan *DBPerson)
 
-	var err error
-	go func(id int, err *error) {
-		defer close(dbOut)
-		Error := db.GetUser(id, dbOut)
-		err = &Error
-		if Error != nil {
-			close(dbOut)
-		}
-	}(id, &err)
-
-	personModel := <-dbOut
+	personModel, err := getUserData(db, id)
 	if err != nil {
 		return nil, err
 	}
-
 	populatedPerson := PopulatedPerson{
 		ID:   personModel.ID,
 		Name: personModel.Name,
 	}
 
-	_ = personModel.getFriends(db, &populatedPerson)
+	personModel.appendFriends(db, &populatedPerson)
 
 	return &populatedPerson, nil
 }
 
-func (person *DBPerson) getFriends(db *Database, populatedPerson *PopulatedPerson) error {
-	dbOut := make(chan *DBPerson, len(person.Friends))
-	defer close(dbOut)
-	var wg sync.WaitGroup
-
+func (person *DBPerson) appendFriends(db *Database, populatedPerson *PopulatedPerson) {
 	for _, personID := range person.Friends {
-		wg.Add(1)
-		go func(personID int) {
-			defer wg.Done()
-			_ = db.GetUser(personID, dbOut)
-		}(personID)
-
-		personModel := <-dbOut
+		personModel, _ := getUserData(db, personID)
 		populatedPerson.Friends = append(populatedPerson.Friends, *personModel)
-
 	}
+}
 
-	wg.Wait()
-	return nil
+func getUserData(db *Database, id int) (*DBPerson, error) {
+	errChan := make(chan error)
+	dataChan := make(chan *DBPerson)
+
+	go func(id int) {
+		defer close(dataChan)
+		defer close(errChan)
+
+		err := db.GetUser(id, dataChan)
+		if err != nil {
+			errChan <- err
+		}
+	}(id)
+
+	select {
+	case personData := <-dataChan:
+		return personData, nil
+	case err := <-errChan:
+		return nil, err
+	}
 }
