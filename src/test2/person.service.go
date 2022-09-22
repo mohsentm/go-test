@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	//ErrNotImplemented = errors.New("not_implemented")
+	ErrNotImplemented = errors.New("not_implemented")
 	ErrPersonNotFound = errors.New("account_not_found")
 )
 

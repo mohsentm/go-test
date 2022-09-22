@@ -1,3 +1,8 @@
+/*
+ * BUG: Invalid user ID defined in the expected data.
+ *      There was a user with ID 350 which doesn't exist. I replaced the ID with correct one (123)
+ *      I added an extra test for covering the not found exception
+ */
 package test2
 
 import (
@@ -11,10 +16,10 @@ import (
 func NewDatabase() *Database {
 	return &Database{
 		database: map[int]*DBPerson{
-			621: &DBPerson{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
-			123: &DBPerson{ID: 123, Name: "FriendNo1", Friends: []int{621, 631}},
-			251: &DBPerson{ID: 251, Name: "SecondBestFriend", Friends: []int{621}},
-			631: &DBPerson{ID: 631, Name: "ThirdWh33l", Friends: []int{621, 123, 251}},
+			621: {ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
+			123: {ID: 123, Name: "FriendNo1", Friends: []int{621, 631}},
+			251: {ID: 251, Name: "SecondBestFriend", Friends: []int{621}},
+			631: {ID: 631, Name: "ThirdWh33l", Friends: []int{621, 123, 251}},
 		},
 	}
 }
@@ -43,9 +48,9 @@ func TestPopulate(t *testing.T) {
 				ID:   621,
 				Name: "XxDragonSlayerxX",
 				Friends: []DBPerson{
-					DBPerson{ID: 123, Name: "FriendNo1", Friends: []int{621, 631}},
-					DBPerson{ID: 251, Name: "SecondBestFriend", Friends: []int{621}},
-					DBPerson{ID: 631, Name: "ThirdWh33l", Friends: []int{621, 123, 251}},
+					{ID: 123, Name: "FriendNo1", Friends: []int{621, 631}},
+					{ID: 251, Name: "SecondBestFriend", Friends: []int{621}},
+					{ID: 631, Name: "ThirdWh33l", Friends: []int{621, 123, 251}},
 				},
 			},
 			err: nil,
@@ -61,8 +66,8 @@ func TestPopulate(t *testing.T) {
 				ID:   123,
 				Name: "FriendNo1",
 				Friends: []DBPerson{
-					DBPerson{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
-					DBPerson{ID: 631, Name: "ThirdWh33l", Friends: []int{621, 123, 251}},
+					{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
+					{ID: 631, Name: "ThirdWh33l", Friends: []int{621, 123, 251}},
 				},
 			},
 			err: nil,
@@ -73,7 +78,7 @@ func TestPopulate(t *testing.T) {
 				ID:   251,
 				Name: "SecondBestFriend",
 				Friends: []DBPerson{
-					DBPerson{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
+					{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
 				},
 			},
 			err: nil,
@@ -84,9 +89,9 @@ func TestPopulate(t *testing.T) {
 				ID:   631,
 				Name: "ThirdWh33l",
 				Friends: []DBPerson{
-					DBPerson{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
-					DBPerson{ID: 123, Name: "FriendNo1", Friends: []int{621, 631}},
-					DBPerson{ID: 251, Name: "SecondBestFriend", Friends: []int{621}},
+					{ID: 621, Name: "XxDragonSlayerxX", Friends: []int{123, 251, 631}},
+					{ID: 123, Name: "FriendNo1", Friends: []int{621, 631}},
+					{ID: 251, Name: "SecondBestFriend", Friends: []int{621}},
 				},
 			},
 			err: nil,
